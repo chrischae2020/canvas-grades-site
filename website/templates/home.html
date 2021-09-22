@@ -1,0 +1,15 @@
+  
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 align='center'>This is the Home page</h1>
+
+    {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+
+    <a href="{{ url_for('auth.login') }}" >Login</a>
+    <a href="{{ url_for('auth.register') }}">Register</a>
+</div>
+{% endblock %}

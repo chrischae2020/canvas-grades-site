@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}{{ dir['course_name'] }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="center">
+      <a href="/dashboard/">Back to Dashboard</a>
+	  <a href="{{ url_for('views.unstage', course_id=id) }}">Unstage Course</a>
+      <strong>Welcome, {{ session['user']['email'] }}</strong>
+    </div>
+    <br><br>
+    <div>
+      <h1 align='center'>{{ dir['course_name'] }}</h1>
+      <strong>Pathways</strong>
+      <hr width=30% align='left'>
+      <div align='left' class='row'>
+
+		<div class='column'>
+	      {% if pathway %}
+		    <strong>Ideal Grade: {{pathway['ideal_grade']}}%</strong>
+			<p>M: {{pathway['m']}}, N: {{pathway['n']}}</p>
+			<ul>
+			  {% for id, info in dir['grade_groups'].items() %}
+				<li>
+					{% set current = info['group_current_grade'] %}
+					{% set ideal = pathway['pathway'][id] %}
+					{% set group_name = info['group_name'] %}
+					<h3>{{group_name}} -> Goal: {{ideal}}%</h3>
+					{% if info['maximum_points'] == info['possible_points'] %}
+					  <p><strong style='color:blue'>Finished</strong> -- Current Grade: {{current}}%</p>
+					{% elif current >= ideal %}
+					  <p><strong style='color:green'>On Track!</strong> -- Current Grade: {{current}}%</p>
+					{% elif current < ideal %}
+					  <p><strong style='color:red'>Behind</strong> -- Current Grade: {{current}}%</p>
+					{% endif %}
+					<div>
+					</div>
+				</li>
+			  {% endfor %}
+			</ul>
+		  {% else %}
+			<span>No pathways set yet!</span>
+		  {% endif %}
+	    </div>
+
+		<div class='column'>
+		  <form action="{{ url_for('views.pathway', course_id=id) }}" method='POST'>
+			<div>
+			  <label for='ideal_grade'>Enter Ideal Grade (%)</label>
+			  <input type='number' id='ideal_grade' name='ideal_grade' value='90' min='0' max='100'/>
+			</div>
+			<br>
+			<div>
+			  <label for='m_value'>Enter M Modifier</label>
+			  <input type='text' id='m_value' name='m_value' value='1'/>
+			</div>
+			<br>
+			<div>
+			  <label for='n_value'>Enter N Modifier</label>
+			  <input type='text' id='n_value' name='n_value' value='0.25'/>
+			</div>
+			<br>
+			<button type='submit'>Calculate Pathway</button>
+		  </form>
+		</div>
+	  </div>
+    </div>
+    <hr noshade>
+    <div class='row'>
+      <div class='column'>
+        <strong>Remaining Assignments</strong>
+        <hr width=30% align='left'>
+
+	      {% for id, info in dir['grade_groups'].items() %}
+
+		      <h3>{{info['group_name']}}</h3>
+				<ol>
+					{% for assignment_id in info['assignments']['future'] %}
+					<li>
+						{% set a_info = assignments[assignment_id|string] %}
+						{{a_info['name']}}
+						<ul>
+						<li>
+							Points possible: {{a_info['points_possible']}}
+						</li>
+						<li>
+							% of Total Grade: {{a_info['percent_of_total_grade']}}
+						</li>
+						<li>
+							Due: {{a_info['due_at']}}
+						</li>
+						</ul>
+					</li>
+					{% endfor %}
+				</ol>
+
+	      {% endfor %}
+
+
+      </div>
+      <div class='column'>
+        <strong>Course statistics</strong>
+        <hr width=30% align='left'>
+        <span><h3>Current Grade: </h3>{{ dir['course_current_grade'] }}%</span>
+        <span><h3>Group Grades: </h3></span>
+        <ul>
+            {% for id, info in dir['grade_groups'].items() %}
+                <li>
+                    <strong>{{ info['group_name'] }} -- {{ info['group_current_grade'] }}%</strong>
+                    <ul>
+                        <li>
+                            <p>Weight -- {{ info['group_weight'] }}</p>
+                        </li>
+                        <li>
+                            <p>Earned Points -- {{ info['scored_points'] }}</p>
+                        </li>
+                        <li>
+                            <p>Possible Points -- {{ info['possible_points'] }}</p>
+                        </li>
+                        <li>
+                            <p>Maximum Points -- {{ info['maximum_points'] }}</p>
+                        </li>
+                        <li>
+                            <p># of Remaining Assignments -- {{ info['assignments']['future']|length }}</p>
+                        </li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+      </div>
+    </div>
+</div>
+{% endblock %}

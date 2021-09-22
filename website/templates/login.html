@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<form method="POST" action='/login/'>
+    <h1 align='center'>Login</h3>
+
+    {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+
+    <div>
+        <label for='email'>Email Address</label>
+        <input type='email' id='email' name='email' placeholder="Enter email" />
+    </div>
+    <div>
+        <label for='password'>Password</label>
+        <input type='password' id='password' name='password' placeholder="Enter password" />
+    </div>
+    <br />
+    <button type="submit">Login</button>
+</form>
+<br><br>
+<a href="{{ url_for('views.home') }}" >Back to Home</a>
+{% endblock %}
